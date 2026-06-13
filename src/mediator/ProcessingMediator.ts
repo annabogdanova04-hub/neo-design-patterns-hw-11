@@ -5,31 +5,39 @@ import { ErrorLogWriter } from "./writers/ErrorLogWriter";
 import { RejectedWriter } from "./writers/RejectedWriter";
 
 export class ProcessingMediator {
-  private writerMap: Record<string, any>;
-  private rejectedWriter: RejectedWriter;
-  constructor(
-    accessLogWriter: AccessLogWriter,
-    transactionWriter: TransactionWriter,
-    errorLogWriter: ErrorLogWriter,
-    rejectedWriter: RejectedWriter
-  ) {
-    this.writerMap = {
-      access_log: accessLogWriter,
-      transaction: transactionWriter,
-      system_error: errorLogWriter,
-    };
-    this.rejectedWriter = rejectedWriter;
+  private accessLogWriter = new AccessLogWriter();
+  private transactionWriter = new TransactionWriter();
+  private errorLogWriter = new ErrorLogWriter();
+  private rejectedWriter = new RejectedWriter();
+
+  private successCount = 0;
+  private rejectedCount = 0;
+
+  onSuccess(record: DataRecord): void {
+    if (record.type === "access_log") {
+      this.accessLogWriter.write(record);
+    } else if (record.type === "transaction") {
+      this.transactionWriter.write(record);
+    } else if (record.type === "system_error") {
+      this.errorLogWriter.write(record);
+    }
+    this.successCount++;
   }
 
-  onSuccess(record: DataRecord) {
-    // TODO
+  onRejected(original: any, error: string): void {
+    this.rejectedWriter.write(original, error);
+    this.rejectedCount++;
   }
 
-  onRejected(original: DataRecord, error: string) {
-    // TODO
-  }
+  async finalize(total: number): Promise<void> {
+    await this.accessLogWriter.finalize();
+    await this.transactionWriter.finalize();
+    await this.errorLogWriter.finalize();
+    await this.rejectedWriter.finalize();
 
-  async finalize() {
-    // TODO
+    console.log(`[INFO] Завантажено записів: ${total}`);
+    console.log(`[INFO] Успішно оброблено: ${this.successCount}`);
+    console.log(`[WARN] Відхилено з помилками: ${this.rejectedCount}`);
+    console.log(`[INFO] Звіт збережено у директорії output/`);
   }
 }

@@ -8,8 +8,20 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
+    "@types/node": "^22.19.21",
     "ts-node": "^10.9.2",
-    "@types/node": "^22.15.17"
-  }
+    "typescript": "^5.9.3"
+  },
+  "description": "Мета домашнього завдання — закріпити знання поведінкових патернів, **Ланцюжок відповідальностей** та **Посередник**, у сценарії обробки даних наближеному до реальності.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/annabogdanova04-hub/neo-design-patterns-hw-11.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/annabogdanova04-hub/neo-design-patterns-hw-11/issues"
+  },
+  "homepage": "https://github.com/annabogdanova04-hub/neo-design-patterns-hw-11#readme"
 }

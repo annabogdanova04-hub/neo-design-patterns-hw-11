@@ -1,12 +1,13 @@
-import { AccessLogRecord } from "../../models/DataRecord";
 import * as fs from "fs/promises";
 
 export class AccessLogWriter {
-  private records: AccessLogRecord[] = [];
-  write(record: AccessLogRecord) {
+  private records: any[] = [];
+
+  write(record: any): void {
     this.records.push(record);
   }
-  async finalize() {
+
+  async finalize(): Promise<void> {
     await fs.writeFile(
       "src/output/access_logs.json",
       JSON.stringify(this.records, null, 2)

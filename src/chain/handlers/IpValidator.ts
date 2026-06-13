@@ -1,11 +1,11 @@
 import { AbstractHandler } from "../AbstractHandler";
-import { AccessLogRecord } from "../../models/DataRecord";
-
-const ipv4Regex =
-  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 export class IpValidator extends AbstractHandler {
-  protected process(record: AccessLogRecord): AccessLogRecord {
-    // TODO
+  protected process(record: any): any {
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!record.ip || !ipRegex.test(record.ip)) {
+      throw new Error("Invalid IP address");
+    }
+    return record;
   }
 }

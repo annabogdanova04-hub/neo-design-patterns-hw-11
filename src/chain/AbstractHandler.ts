@@ -1,5 +1,3 @@
-import { DataRecord } from "../models/DataRecord";
-
 export abstract class AbstractHandler {
   private next: AbstractHandler | null = null;
 
@@ -8,7 +6,7 @@ export abstract class AbstractHandler {
     return handler;
   }
 
-  handle(record: DataRecord): DataRecord {
+  handle(record: any): any {
     const processed = this.process(record);
     if (this.next) {
       return this.next.handle(processed);
@@ -16,5 +14,5 @@ export abstract class AbstractHandler {
     return processed;
   }
 
-  protected abstract process(record: DataRecord): DataRecord;
+  protected abstract process(record: any): any;
 }

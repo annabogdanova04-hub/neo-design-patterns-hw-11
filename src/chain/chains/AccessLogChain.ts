@@ -1,7 +1,7 @@
+import { AbstractHandler } from "../AbstractHandler";
 import { TimestampParser } from "../handlers/TimestampParser";
 import { UserIdValidator } from "../handlers/UserIdValidator";
 import { IpValidator } from "../handlers/IpValidator";
-import { AbstractHandler } from "../AbstractHandler";
 
 export function buildAccessLogChain(): AbstractHandler {
   const ts = new TimestampParser();

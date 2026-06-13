@@ -1,13 +1,9 @@
 import * as fs from "fs/promises";
+import { DataRecord } from "./models/DataRecord";
 import { buildAccessLogChain } from "./chain/chains/AccessLogChain";
 import { buildTransactionChain } from "./chain/chains/TransactionChain";
 import { buildSystemErrorChain } from "./chain/chains/SystemErrorChain";
 import { ProcessingMediator } from "./mediator/ProcessingMediator";
-import { AccessLogWriter } from "./mediator/writers/AccessLogWriter";
-import { TransactionWriter } from "./mediator/writers/TransactionWriter";
-import { ErrorLogWriter } from "./mediator/writers/ErrorLogWriter";
-import { RejectedWriter } from "./mediator/writers/RejectedWriter";
-import { DataRecord } from "./models/DataRecord";
 
 const handlerMap = {
   access_log: buildAccessLogChain,
@@ -16,12 +12,29 @@ const handlerMap = {
 };
 
 async function main() {
-  // зчитування даних
-  // створення mediator
-  // цикл по records:
-  //   - вибір handler-а через handlerMap
-  //   - try/catch: handle + mediator.onSuccess/onRejected
-  // finalize
+  const raw = await fs.readFile("src/data/records.json", "utf-8");
+  const records: DataRecord[] = JSON.parse(raw);
+
+  const mediator = new ProcessingMediator();
+
+  for (const record of records) {
+    const buildChain = handlerMap[record.type];
+
+    if (!buildChain) {
+      mediator.onRejected(record, `Unknown record type: ${record.type}`);
+      continue;
+    }
+
+    try {
+      const chain = buildChain();
+      const processed = chain.handle(record);
+      mediator.onSuccess(processed);
+    } catch (error: any) {
+      mediator.onRejected(record, error.message);
+    }
+  }
+
+  await mediator.finalize(records.length);
 }
 
 main();
